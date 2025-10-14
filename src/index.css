@@ -1,3 +1,6 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -10,4 +13,77 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+.group:hover ~ body {
+  background-color: white; 
+  transition: background-color 0.5s ease;
+}
+
+.typing-animation {
+      opacity: 0; /* Initially hidden */
+      overflow: hidden;
+      white-space: nowrap;
+      display: inline-block;
+      border-right: 2px solid white; /* Initial caret */
+      animation: typing 2s steps(70, end) forwards, 
+                 blink-caret 0.75s step-end, 
+                 fadeIn 0.1s forwards;
+      animation-delay: var(--delay), var(--delay), var(--delay);
+    }
+
+    /* Typing animation */
+    @keyframes typing {
+      from { 
+        width: 0; 
+      }
+      to { 
+        width: 100%; 
+        border-right: none; /* Remove caret after typing */
+      }
+    }
+
+    /* Blinking caret animation */
+    @keyframes blink-caret {
+      from, to { border-color: transparent; }
+      50% { border-color: white; }
+    }
+
+    /* Fade-in animation to reveal text */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+
+    @keyframes typing {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes blink {
+  50% {
+    border-color: transparent;
+  }
+}
+
+.animate-typing {
+  white-space: nowrap;
+  overflow: hidden;
+  border-right: 2px solid #ec4899; 
+}
+
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateY(20px) scale(0.95); }
+  10%, 90% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(20px) scale(0.95); }
+}
+
+.animate-fade-in-out {
+  animation: fadeInOut 3s ease-in-out forwards;
 }
