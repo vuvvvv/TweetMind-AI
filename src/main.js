@@ -101,16 +101,13 @@ export default function ChatApp() {
           data = await res.json();
           errorMsg = data.error || data.message || errorMsg;
         } catch (jsonError) {
-          
           errorMsg = "Invalid server response format";
         }
       } else {
         const text = await res.text();
-        
+
         errorMsg = text || "Unexpected server response";
       }
-
-      
 
       if (!res.ok) {
         if (
@@ -158,7 +155,6 @@ export default function ChatApp() {
       setTimeout(() => setAuthError(""), 5000);
       setLoading(false);
     } catch (err) {
-      
       setAuthError(
         language === "ar" ? `حدث خطأ: ${err.message}` : `Error: ${err.message}`
       );
@@ -201,105 +197,100 @@ export default function ChatApp() {
     }
   };
 
- const handleSendMessage = async () => {
-   if (!token) {
-     setShowAuthModal(true);
-     return;
-   }
+  const handleSendMessage = async () => {
+    if (!token) {
+      setShowAuthModal(true);
+      return;
+    }
 
-   if (dailyCount >= 2) {
-   
-     return;
-   }
+    if (dailyCount >= 2) {
+      return;
+    }
 
-   const input = chatInput.trim();
-   if (!input) return;
+    const input = chatInput.trim();
+    if (!input) return;
 
-   setAutoScroll(true);
-   setChatHistory([...chatHistory, { role: "user", content: input }]);
-   setChatInput("");
-   setLoading(true);
-   setMessage("");
+    setAutoScroll(true);
+    setChatHistory([...chatHistory, { role: "user", content: input }]);
+    setChatInput("");
+    setLoading(true);
+    setMessage("");
 
-   try {
-     const response = await fetch(`${API_BASE}/fetch-analyze`, {
-       method: "POST",
-       headers: {
-         "Content-Type": "application/json",
-         Authorization: `Bearer ${token}`,
-       },
-       body: JSON.stringify({ username: input, lan: language }),
-     });
+    try {
+      const response = await fetch(`${API_BASE}/fetch-analyze`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ username: input, lan: language }),
+      });
 
-     if (!response.ok) {
-       
-       let errorText = await response.text();
-       if (!errorText) errorText = "خطأ غير معروف";
-       throw new Error(errorText);
-     }
+      if (!response.ok) {
+        let errorText = await response.text();
+        if (!errorText) errorText = "خطأ غير معروف";
+        throw new Error(errorText);
+      }
 
-     setShowAIWarning(true);
-     setTimeout(() => setShowAIWarning(false), 3000);
-     setChatHistory((prev) => [...prev, { role: "assistant", content: "" }]);
+      setShowAIWarning(true);
+      setTimeout(() => setShowAIWarning(false), 3000);
+      setChatHistory((prev) => [...prev, { role: "assistant", content: "" }]);
 
-     const reader = response.body.getReader();
-     const decoder = new TextDecoder();
-     let displayed = "";
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let displayed = "";
 
-     while (true) {
-       const { done, value } = await reader.read();
-       if (done) break;
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
 
-       displayed += decoder.decode(value);
+        displayed += decoder.decode(value);
 
-       setChatHistory((prev) => {
-         const last = [...prev];
-         last[last.length - 1].content = displayed;
-         return last;
-       });
+        setChatHistory((prev) => {
+          const last = [...prev];
+          last[last.length - 1].content = displayed;
+          return last;
+        });
 
-       if (autoScroll) {
-         const el = chatContainerRef.current;
-         if (el) el.scrollTop = el.scrollHeight;
-       }
-     }
+        if (autoScroll) {
+          const el = chatContainerRef.current;
+          if (el) el.scrollTop = el.scrollHeight;
+        }
+      }
 
-     setDailyCount((prev) => prev + 1);
-   } catch (err) {
-    
+      setDailyCount((prev) => prev + 1);
+    } catch (err) {
+      const errorMessages = {
+        ar: {
+          noTweets: "لم أجد أي تغريدات لتحليل هذا الحساب.",
+          username: "هذا الحساب غير موجود أو لا يمكن الوصول إليه.",
+          limit: "لقد تجاوزت الحد اليومي، حاول لاحقًا.",
+          unknown: "حدث خطأ أثناء التحليل، حاول مجددًا.",
+        },
+        en: {
+          noTweets: "I couldn’t find any tweets for this account.",
+          username: "This account doesn't exist or isn't accessible.",
+          limit: "You've reached your daily limit. Try again later.",
+          unknown: "An error occurred during analysis. Please try again.",
+        },
+      };
 
-    
-     const errorMessages = {
-       ar: {
-         noTweets: "لم أجد أي تغريدات لتحليل هذا الحساب.",
-         username: "هذا الحساب غير موجود أو لا يمكن الوصول إليه.",
-         limit: "لقد تجاوزت الحد اليومي، حاول لاحقًا.",
-         unknown: "حدث خطأ أثناء التحليل، حاول مجددًا.",
-       },
-       en: {
-         noTweets: "I couldn’t find any tweets for this account.",
-         username: "This account doesn't exist or isn't accessible.",
-         limit: "You've reached your daily limit. Try again later.",
-         unknown: "An error occurred during analysis. Please try again.",
-       },
-     };
+      let msg;
+      const text = err.message || "";
+      if (text.includes("No tweets")) msg = errorMessages[language].noTweets;
+      else if (text.includes("Username"))
+        msg = errorMessages[language].username;
+      else if (text.includes("limit")) msg = errorMessages[language].limit;
+      else msg = errorMessages[language].unknown;
 
-     let msg;
-     const text = err.message || "";
-     if (text.includes("No tweets")) msg = errorMessages[language].noTweets;
-     else if (text.includes("Username")) msg = errorMessages[language].username;
-     else if (text.includes("limit")) msg = errorMessages[language].limit;
-     else msg = errorMessages[language].unknown;
-
-     setChatHistory((prev) => [
-       ...prev,
-       { role: "assistant", content: `🤖 ${msg}` },
-     ]);
-   } finally {
-     setLoading(false);
-   }
- };
-
+      setChatHistory((prev) => [
+        ...prev,
+        { role: "assistant", content: `🤖 ${msg}` },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -319,7 +310,7 @@ export default function ChatApp() {
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-gradient-to-br  rounded-lg flex items-center justify-center">
               <img
-                src="${process.env.PUBLIC_URL}/icon.png"
+                src={`${process.env.PUBLIC_URL}/icon.png`}
                 alt="Logo"
                 className="w-9 h-9 object-contain"
               />
