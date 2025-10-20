@@ -7,7 +7,7 @@ This project is a full-stack web application designed to analyze a user's person
 
 The core functionality involves fetching a user's tweets, processing the textual data, and applying analysis algorithms to extract insights into their personality traits. This project demonstrates the integration of modern web technologies with data analysis techniques, offering both a practical and engaging user experience.
 
-![""](img/1.jpg)
+![""](img/1.JPG)
 
 <br><br>
 
