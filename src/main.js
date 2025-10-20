@@ -319,7 +319,7 @@ export default function ChatApp() {
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-gradient-to-br  rounded-lg flex items-center justify-center">
               <img
-                src="/icon.png"
+                src="${process.env.PUBLIC_URL}/icon.png"
                 alt="Logo"
                 className="w-9 h-9 object-contain"
               />
@@ -359,7 +359,6 @@ export default function ChatApp() {
                     <>
                       <div className="px-3 py-2 text-gray-300 border-b border-gray-800 mb-2">
                         <p>{email || "User"}</p>
-                        
                       </div>
 
                       <button

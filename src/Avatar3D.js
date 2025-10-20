@@ -59,7 +59,7 @@ const Avatar3D = () => {
     let baseY = 0;
 
     loader.load(
-      "/tv_man.glb",
+      "${process.env.PUBLIC_URL}/tv_man.glb",
       (gltf) => {
         const model = gltf.scene;
         const avatarGroup = new THREE.Group();
@@ -93,10 +93,7 @@ const Avatar3D = () => {
         setModelLoaded(true);
       },
       undefined,
-      (error) => {
-       
-        
-      }
+      (error) => {}
     );
 
    
