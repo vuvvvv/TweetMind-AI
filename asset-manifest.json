@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/TweetMind-AI/static/css/main.6d6bb330.css",
+    "main.js": "/TweetMind-AI/static/js/main.2da958c1.js",
+    "static/js/453.acd5e053.chunk.js": "/TweetMind-AI/static/js/453.acd5e053.chunk.js",
+    "index.html": "/TweetMind-AI/index.html",
+    "main.6d6bb330.css.map": "/TweetMind-AI/static/css/main.6d6bb330.css.map",
+    "main.2da958c1.js.map": "/TweetMind-AI/static/js/main.2da958c1.js.map",
+    "453.acd5e053.chunk.js.map": "/TweetMind-AI/static/js/453.acd5e053.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.6d6bb330.css",
+    "static/js/main.2da958c1.js"
+  ]
+}
