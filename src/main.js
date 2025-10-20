@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Send, Sparkles, Globe, User, LogOut } from "lucide-react";
+import { Send, Globe, User, LogOut } from "lucide-react";
 import "./index.css";
 import Avatar3D from "./Avatar3D";
 
@@ -8,7 +8,7 @@ export default function ChatApp() {
   const [password, setPassword] = useState("");
   const [token, setToken] = useState("");
   const [message, setMessage] = useState("");
-  const [authError, setAuthError] = useState(""); 
+  const [authError, setAuthError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [chatInput, setChatInput] = useState("");
@@ -21,17 +21,15 @@ export default function ChatApp() {
 
   const chatContainerRef = useRef(null);
   const messagesEndRef = useRef(null);
-  const API_BASE = "http://localhost:8080";
+  const API_BASE = "http://18.217.211.86";
 
-  
-useEffect(() => {
-  document.title =
-    language === "ar"
-      ? "TweetAI - تحليل تغريدات"
-      : "TweetAI - Tweet Analysis";
-}, [language]);
+  useEffect(() => {
+    document.title =
+      language === "ar"
+        ? "TweetAI - تحليل تغريدات"
+        : "TweetAI - Tweet Analysis";
+  }, [language]);
 
-  
   const handleLogout = () => {
     setToken("");
     setDailyCount(0);
@@ -57,34 +55,22 @@ useEffect(() => {
     setMessage("");
   };
 
-  
-const handleAIResponse = async (text) => {
-  let displayed = "";
-
-  for (let i = 0; i < text.length; i++) {
-    displayed += text[i];
-    await new Promise((r) => setTimeout(r, 15));
-
-    setChatHistory((prev) => {
-      const last = [...prev];
-      last[last.length - 1].content = displayed;
-      return last;
-    });
-
-    
-    if (autoScroll) {
-      const el = chatContainerRef.current;
-      if (el) {
-        el.scrollTop = el.scrollHeight;
-      }
-    }
-  }
-};
   const handleSignup = async () => {
     setLoading(true);
     setAuthError("");
+    setMessage("");
 
- 
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@(gmail|hotmail)\.com$/i;
+    if (!emailRegex.test(email)) {
+      setAuthError(
+        language === "ar"
+          ? "يرجى إدخال بريد إلكتروني صحيح من Gmail أو Hotmail فقط (مثال: name@gmail.com)."
+          : "Please enter a valid Gmail or Hotmail address (e.g., name@gmail.com)."
+      );
+      setLoading(false);
+      return;
+    }
+
     const passwordRegex = /^(?=.*[A-Z])(?=.*[\W_]).{8,}$/;
     if (!passwordRegex.test(password)) {
       setAuthError(
@@ -99,21 +85,86 @@ const handleAIResponse = async (text) => {
     try {
       const res = await fetch(`${API_BASE}/signup`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Accept-Language": language,
+        },
         body: JSON.stringify({ email, password }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || data.message);
-      setMessage(`✅ ${data.message}`);
+
+      let data = {};
+      let errorMsg = "Signup failed";
+
+      const contentType = res.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        try {
+          data = await res.json();
+          errorMsg = data.error || data.message || errorMsg;
+        } catch (jsonError) {
+          
+          errorMsg = "Invalid server response format";
+        }
+      } else {
+        const text = await res.text();
+        
+        errorMsg = text || "Unexpected server response";
+      }
+
+      
+
+      if (!res.ok) {
+        if (
+          res.status === 409 ||
+          errorMsg.includes("Email already exists") ||
+          errorMsg.includes("EMAIL_EXISTS")
+        ) {
+          setAuthError(
+            language === "ar"
+              ? "هذا الحساب موجود فعلاً"
+              : "Email already exists"
+          );
+        } else if (
+          res.status === 400 &&
+          errorMsg.includes("Password is too weak")
+        ) {
+          setAuthError(
+            language === "ar"
+              ? "كلمة المرور ضعيفة جدًا"
+              : "Password is too weak"
+          );
+        } else if (
+          res.status === 400 &&
+          errorMsg.includes("Invalid email format")
+        ) {
+          setAuthError(
+            language === "ar"
+              ? "تنسيق البريد الإلكتروني غير صحيح"
+              : "Invalid email format"
+          );
+        } else {
+          setAuthError(
+            language === "ar" ? `حدث خطأ: ${errorMsg}` : `Error: ${errorMsg}`
+          );
+        }
+        setLoading(false);
+        return;
+      }
+
+      const successMessage =
+        language === "ar"
+          ? "تم إنشاء الحساب بنجاح!"
+          : "Account created successfully!";
+      setAuthError({ text: successMessage, color: "green" });
+      setTimeout(() => setAuthError(""), 5000);
+      setLoading(false);
     } catch (err) {
+      
       setAuthError(
-        language === "ar" ? "هذا البريد مستخدم بالفعل" : "Email already exists"
+        language === "ar" ? `حدث خطأ: ${err.message}` : `Error: ${err.message}`
       );
-    } finally {
       setLoading(false);
     }
   };
-
 
   const handleLogin = async () => {
     setLoading(true);
@@ -124,8 +175,17 @@ const handleAIResponse = async (text) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || data.message);
+
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        data = {};
+      }
+
+      if (!res.ok)
+        throw new Error(data.error || data.message || "Login failed");
+
       setToken(data.token);
       setShowAuthModal(false);
       setDailyCount(data.dailyCount || 0);
@@ -141,85 +201,105 @@ const handleAIResponse = async (text) => {
     }
   };
 
-  const handleSendMessage = async () => {
-    if (!token) {
-      setShowAuthModal(true);
-      return;
-    }
-    if (dailyCount >= 2) {
-      setMessage(
-        language === "ar"
-          ? "❌ لقد وصلت إلى الحد اليومي (رسالتين فقط). حاول غدًا!"
-          : "❌ You've reached your daily limit of 2 messages. Try again tomorrow!"
-      );
-      return;
-    }
+ const handleSendMessage = async () => {
+   if (!token) {
+     setShowAuthModal(true);
+     return;
+   }
 
-    const input = chatInput.trim();
-    if (!input) return;
-    setAutoScroll(true); 
-    setChatHistory([...chatHistory, { role: "user", content: input }]);
-    setChatInput("");
-    setLoading(true);
-    setMessage("");
+   if (dailyCount >= 2) {
+   
+     return;
+   }
 
-    try {
-      const res = await fetch(`${API_BASE}/fetch-analyze`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ username: input, lan: language }),
-      });
+   const input = chatInput.trim();
+   if (!input) return;
 
-      const text = await res.text();
-      let data;
-      try {
-        data = JSON.parse(text);
-      } catch {
-        
-        throw new Error(text);
-      }
+   setAutoScroll(true);
+   setChatHistory([...chatHistory, { role: "user", content: input }]);
+   setChatInput("");
+   setLoading(true);
+   setMessage("");
 
-      if (!res.ok)
-        throw new Error(data.error || data.message || "Unknown error");
+   try {
+     const response = await fetch(`${API_BASE}/fetch-analyze`, {
+       method: "POST",
+       headers: {
+         "Content-Type": "application/json",
+         Authorization: `Bearer ${token}`,
+       },
+       body: JSON.stringify({ username: input, lan: language }),
+     });
 
-      setChatHistory((prev) => [...prev, { role: "assistant", content: "" }]);
-      await handleAIResponse(data.result);
-      setShowAIWarning(true);
-      setTimeout(() => setShowAIWarning(false), 3000);
-      setDailyCount((prev) => prev + 1);
-    } catch (err) {
-      const errorText =
-        language === "ar"
-          ? `🤖 ${
-              err.message.includes("No tweets")
-                ? "لم أجد أي تغريدات لتحليل هذا الحساب."
-                : err.message.includes("Username")
-                ? "هذا الحساب غير موجود أو لا يمكن الوصول إليه."
-                : err.message.includes("limit")
-                ? "لقد تجاوزت الحد اليومي، حاول لاحقًا."
-                : "حدث خطأ أثناء التحليل، حاول مجددًا."
-            }`
-          : `🤖 ${
-              err.message.includes("No tweets")
-                ? "I couldn’t find any tweets for this account."
-                : err.message.includes("Username")
-                ? "This account doesn't exist or isn't accessible."
-                : err.message.includes("limit")
-                ? "You've reached your daily limit. Try again later."
-                : "An error occurred during analysis. Please try again."
-            }`;
+     if (!response.ok) {
+       
+       let errorText = await response.text();
+       if (!errorText) errorText = "خطأ غير معروف";
+       throw new Error(errorText);
+     }
 
-      setChatHistory((prev) => [
-        ...prev,
-        { role: "assistant", content: errorText },
-      ]);
-    } finally {
-      setLoading(false);
-    }
-  };
+     setShowAIWarning(true);
+     setTimeout(() => setShowAIWarning(false), 3000);
+     setChatHistory((prev) => [...prev, { role: "assistant", content: "" }]);
+
+     const reader = response.body.getReader();
+     const decoder = new TextDecoder();
+     let displayed = "";
+
+     while (true) {
+       const { done, value } = await reader.read();
+       if (done) break;
+
+       displayed += decoder.decode(value);
+
+       setChatHistory((prev) => {
+         const last = [...prev];
+         last[last.length - 1].content = displayed;
+         return last;
+       });
+
+       if (autoScroll) {
+         const el = chatContainerRef.current;
+         if (el) el.scrollTop = el.scrollHeight;
+       }
+     }
+
+     setDailyCount((prev) => prev + 1);
+   } catch (err) {
+    
+
+    
+     const errorMessages = {
+       ar: {
+         noTweets: "لم أجد أي تغريدات لتحليل هذا الحساب.",
+         username: "هذا الحساب غير موجود أو لا يمكن الوصول إليه.",
+         limit: "لقد تجاوزت الحد اليومي، حاول لاحقًا.",
+         unknown: "حدث خطأ أثناء التحليل، حاول مجددًا.",
+       },
+       en: {
+         noTweets: "I couldn’t find any tweets for this account.",
+         username: "This account doesn't exist or isn't accessible.",
+         limit: "You've reached your daily limit. Try again later.",
+         unknown: "An error occurred during analysis. Please try again.",
+       },
+     };
+
+     let msg;
+     const text = err.message || "";
+     if (text.includes("No tweets")) msg = errorMessages[language].noTweets;
+     else if (text.includes("Username")) msg = errorMessages[language].username;
+     else if (text.includes("limit")) msg = errorMessages[language].limit;
+     else msg = errorMessages[language].unknown;
+
+     setChatHistory((prev) => [
+       ...prev,
+       { role: "assistant", content: `🤖 ${msg}` },
+     ]);
+   } finally {
+     setLoading(false);
+   }
+ };
+
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -230,12 +310,10 @@ const handleAIResponse = async (text) => {
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col relative">
-      {/* 3D Avatar */}
       <div className="fixed inset-0 z-0 pointer-events-none bg-black">
         <Avatar3D />
       </div>
 
-      {/* Header */}
       <div className="  sticky top-0 z-50 ">
         <div className="w-full px-6 py-4 flex items-center justify-between  relative z-50">
           <div className="flex items-center gap-3">
@@ -252,16 +330,12 @@ const handleAIResponse = async (text) => {
           </div>
 
           <div className="flex items-center gap-4">
-            {/* Language Toggle */}
             <button
               onClick={() => setLanguage(language === "en" ? "ar" : "en")}
               className="flex items-center gap-1 text-gray-400 hover:text-white transition"
             >
               <Globe size={18} />
-             
             </button>
-
-            {/* Account Menu */}
 
             <div
               className="relative"
@@ -285,10 +359,7 @@ const handleAIResponse = async (text) => {
                     <>
                       <div className="px-3 py-2 text-gray-300 border-b border-gray-800 mb-2">
                         <p>{email || "User"}</p>
-                        <p className="text-xs text-gray-500">
-                          {dailyCount}
-                          {language === "ar" ? "/2 رسائل" : "/2 messages"}
-                        </p>
+                        
                       </div>
 
                       <button
@@ -316,7 +387,6 @@ const handleAIResponse = async (text) => {
         </div>
       </div>
 
-      {/* Chat Area */}
       <div
         ref={chatContainerRef}
         className="flex-1 overflow-y-auto relative z-10"
@@ -337,13 +407,13 @@ const handleAIResponse = async (text) => {
                     : "Have you encountered someone strange today?"}
                 </span>
               </div>
-             
-                <h2 className="  text-3xl font-bold mb-3 bg-gradient-to-r from-blue-400 to-slate-600 bg-clip-text text-transparent">
-                  {language === "ar"
-                    ? "هل ترغب أن أُطلعك على صورة شخصيته من تغريداته؟"
-                    : "Want to see his personality through his tweets?"}
-                </h2>
-             
+
+              <h2 className="  text-3xl font-bold mb-3 bg-gradient-to-r from-blue-400 to-slate-600 bg-clip-text text-transparent">
+                {language === "ar"
+                  ? "هل ترغب أن أُطلعك على صورة شخصيته من تغريداته؟"
+                  : "Want to see his personality through his tweets?"}
+              </h2>
+
               <p className="text-gray-500 max-w-sm">
                 {language === "ar"
                   ? "أدخل اسم المستخدم، ودعني أقرأ ما وراء التغريدات."
@@ -355,13 +425,23 @@ const handleAIResponse = async (text) => {
               {chatHistory.map((msg, idx) => (
                 <div key={idx} className="flex w-full mb-2">
                   {msg.role === "user" ? (
-                    <div className="ml-auto flex items-end gap-2 max-w-[70%]">
+                    <div
+                      className={`ml-auto flex items-end gap-2 max-w-[70%] ${
+                        language === "ar" ? "text-right" : "text-left"
+                      }`}
+                      dir={language === "ar" ? "rtl" : "ltr"}
+                    >
                       <div className="bg-blue-600/80 text-white px-4 py-2 rounded-2xl whitespace-pre-wrap break-words">
                         {msg.content}
                       </div>
                     </div>
                   ) : (
-                    <div className="flex items-start gap-2 max-w-[70%]">
+                    <div
+                      className={`flex items-start gap-2 max-w-[70%] ${
+                        language === "ar" ? "text-right" : "text-left"
+                      }`}
+                      dir={language === "ar" ? "rtl" : "ltr"}
+                    >
                       <div className="bg-gray-800/60 text-white px-4 py-2 rounded-2xl whitespace-pre-wrap break-words">
                         {msg.content}
                       </div>
@@ -384,7 +464,6 @@ const handleAIResponse = async (text) => {
         </div>
       </div>
 
-      {/* Error / Info */}
       {message && (
         <div className="max-w-4xl mx-auto px-6 pb-2 relative z-10">
           <div
@@ -399,7 +478,6 @@ const handleAIResponse = async (text) => {
         </div>
       )}
 
-      {/* Input */}
       <div className="  sticky bottom-0 z-10">
         <div className="max-w-4xl mx-auto px-6 py-4">
           <div className="relative">
@@ -428,7 +506,6 @@ const handleAIResponse = async (text) => {
         </div>
       </div>
 
-      {/* Auth Modal */}
       {showAuthModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex justify-center items-center z-50 p-4">
           <div className="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-md overflow-hidden">
@@ -462,8 +539,11 @@ const handleAIResponse = async (text) => {
               </div>
 
               {authError && (
-                <p className="text-red-400 text-sm text-center mt-3">
-                  {authError}
+                <p
+                  className="text-sm text-center mt-3"
+                  style={{ color: authError.color || "red" }}
+                >
+                  {authError.text || authError}
                 </p>
               )}
 
@@ -495,9 +575,8 @@ const handleAIResponse = async (text) => {
         </div>
       )}
 
-      {/* AI Warning */}
       {showAIWarning && (
-        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2  text-white  px-4 py-2 rounded-lg text-sm z-50 animate-fade-in-out">
+        <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-900/90 text-white px-4 py-2 rounded-lg text-sm z-50 shadow-lg backdrop-blur-md animate-fade-in-out">
           {language === "ar"
             ? "⚠️ هذا التحليل من الذكاء الصناعي وقد يكون صواب أو خطأ."
             : "⚠️ This analysis is AI-generated and may be correct or incorrect."}
@@ -505,4 +584,4 @@ const handleAIResponse = async (text) => {
       )}
     </div>
   );
-};  
+}

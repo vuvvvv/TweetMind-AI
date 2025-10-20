@@ -23,12 +23,12 @@ const Avatar3D = () => {
 
    
     const camera = new THREE.PerspectiveCamera(
-      60,
+      80,
       mountRef.current.clientWidth / mountRef.current.clientHeight,
       0.1,
       1000
     );
-    camera.position.set(0, 1.5, 3.5); 
+    camera.position.set(0, 0.2, 3.5); 
     camera.lookAt(0, 1.5, 0);
 
    
@@ -94,8 +94,8 @@ const Avatar3D = () => {
       },
       undefined,
       (error) => {
-        console.error("فشل تحميل النموذج:", error);
-        setLoadingError("فشل تحميل النموذج");
+       
+        
       }
     );
 
@@ -130,7 +130,7 @@ const Avatar3D = () => {
     );
     const particlesMaterial = new THREE.PointsMaterial({
       color: 0xffffff,
-      size: 0.02,
+      size: 0.04,
       transparent: true,
       opacity: 0.8,
     });
