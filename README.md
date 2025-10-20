@@ -1,12 +1,14 @@
- #             TweetMind AI
+# TweetMind AI++
+
 !["Go react"](img/2.png)
 `Go+React`
 <br><br>
- This project is a full-stack web application designed to analyze a user's personality based on their social media activity, specifically through their tweets. The backend is developed in Go (Golang), ensuring high performance, concurrency, and efficient handling of API requests. The frontend is built with React, providing a dynamic and responsive user interface for users to interact with.
+This project is a full-stack web application designed to analyze a user's personality based on their social media activity, specifically through their tweets. The backend is developed in Go (Golang), ensuring high performance, concurrency, and efficient handling of API requests. The frontend is built with React, providing a dynamic and responsive user interface for users to interact with.
 
 The core functionality involves fetching a user's tweets, processing the textual data, and applying analysis algorithms to extract insights into their personality traits. This project demonstrates the integration of modern web technologies with data analysis techniques, offering both a practical and engaging user experience.
 
-- !["Go react"](img/1.jpg)
+![""](img/1.jpg)
+
 <br><br>
 
 ## <_The analysis is built upon the following aspects_>
@@ -37,27 +39,25 @@ The core functionality involves fetching a user's tweets, processing the textual
 
 ### <_Secure Personality Analysis from Tweets_>
 
-
 This project analyzes a user's personality safely by fetching tweets through [Nitter](https://nitter.net/), a privacy-focused Twitter alternative. All data retrieval is handled securely, without exposing user credentials or personal information.
 <br><br>
+
 ## <_Oops Daily Usage Limits😊_>
 
 Daily usage limits apply to each account to ensure stable performance of the AI analysis
 
 ![](img/3.JPG)
 
-
-` "dailyCount": count + 1 `
+`"dailyCount": count + 1`
 
 <br><br>
 
 ## <_Immersive 3D Space Background_>
-The chat interface features a 3D model background inspired by space, with dynamic camera movement to create an immersive and visually engaging experience [Avatar3D.js](src/Avatar3D.js).
 
+The chat interface features a 3D model background inspired by space, with dynamic camera movement to create an immersive and visually engaging experience [Avatar3D.js](src/Avatar3D.js).
 
 ![](img/4.JPG)
 [Tv_man](https://sketchfab.com/3d-models/tv-man-animation-7699139638a247ce9d061f38e8ec7cc8)
-
 
 <br><br>
 If you encounter any issues or have suggestions for the project, feel free to let me know.
@@ -87,7 +87,6 @@ If you encounter any issues or have suggestions for the project, feel free to le
 <meta name="twitter:title" content="TweetMind AI - تحليل التغريدات بالذكاء الاصطناعي">
 <meta name="twitter:description" content="حلل التغريدات واكتشف محتواها العاطفي والنغمة باستخدام الذكاء الاصطناعي بسهولة.">
 <meta name="twitter:image" content="img/1.jpg">
-
 
 <!-- 🔹 Favicon & Theme -->
 <link rel="icon" type="image/png" sizes="32x32" href="img/1.jpg">
