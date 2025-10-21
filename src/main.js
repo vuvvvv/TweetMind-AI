@@ -21,7 +21,7 @@ export default function ChatApp() {
 
   const chatContainerRef = useRef(null);
   const messagesEndRef = useRef(null);
-  const API_BASE = "https://18.217.211.86";
+  const API_BASE = "https://tweetmind.duckdns.org";
 
   useEffect(() => {
     document.title =
