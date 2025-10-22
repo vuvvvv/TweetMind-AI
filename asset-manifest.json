@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/TweetMind-AI/static/css/main.72ed23b6.css",
-    "main.js": "/TweetMind-AI/static/js/main.0b4e6065.js",
+    "main.css": "/TweetMind-AI/static/css/main.6d6bb330.css",
+    "main.js": "/TweetMind-AI/static/js/main.afdbf862.js",
     "static/js/453.acd5e053.chunk.js": "/TweetMind-AI/static/js/453.acd5e053.chunk.js",
     "index.html": "/TweetMind-AI/index.html",
-    "main.72ed23b6.css.map": "/TweetMind-AI/static/css/main.72ed23b6.css.map",
-    "main.0b4e6065.js.map": "/TweetMind-AI/static/js/main.0b4e6065.js.map",
+    "main.6d6bb330.css.map": "/TweetMind-AI/static/css/main.6d6bb330.css.map",
+    "main.afdbf862.js.map": "/TweetMind-AI/static/js/main.afdbf862.js.map",
     "453.acd5e053.chunk.js.map": "/TweetMind-AI/static/js/453.acd5e053.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.72ed23b6.css",
-    "static/js/main.0b4e6065.js"
+    "static/css/main.6d6bb330.css",
+    "static/js/main.afdbf862.js"
   ]
 }
