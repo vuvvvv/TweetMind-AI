@@ -22,27 +22,6 @@ export default function ChatApp() {
   const chatContainerRef = useRef(null);
   const messagesEndRef = useRef(null);
   const API_BASE = "https://tweetmind.duckdns.org";
-  useEffect(() => {
-    const setVh = () => {
-      const vh = (window.visualViewport?.height || window.innerHeight) * 0.01;
-      document.documentElement.style.setProperty("--vh", `${vh}px`);
-    };
-
-    setVh();
-    window.addEventListener("resize", setVh);
-    window.visualViewport?.addEventListener("resize", setVh);
-
-    return () => {
-      window.removeEventListener("resize", setVh);
-      window.visualViewport?.removeEventListener("resize", setVh);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (autoScroll && messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [chatHistory, autoScroll]);
 
   useEffect(() => {
     document.title =
@@ -319,16 +298,17 @@ export default function ChatApp() {
       handleSendMessage();
     }
   };
+
   return (
     <div className="min-h-screen bg-black text-white flex flex-col relative">
       <div className="fixed inset-0 z-0 pointer-events-none bg-black">
         <Avatar3D />
       </div>
 
-      <div className="sticky top-0 z-50">
-        <div className="w-full px-6 py-4 flex items-center justify-between relative z-50">
+      <div className="  sticky top-0 z-50 ">
+        <div className="w-full px-6 py-4 flex items-center justify-between  relative z-50">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-br rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-br  rounded-lg flex items-center justify-center">
               <img
                 src={`${process.env.PUBLIC_URL}/icon.png`}
                 alt="Logo"
@@ -336,7 +316,7 @@ export default function ChatApp() {
               />
             </div>
             <h1 className="text-xl font-semibold text-left ml-0">
-              {language === "ar" ? "TweetMind AI" : "TweetMind AI"}
+              {language === "ar" ? "TweetMind AI " : "TweetMind AI"}
             </h1>
           </div>
 
@@ -386,8 +366,8 @@ export default function ChatApp() {
                       className="w-full text-left px-3 py-2 text-gray-300 hover:bg-gray-800 rounded-lg transition"
                     >
                       {language === "ar"
-                        ? "تسجيل الدخول / إنشاء حساب"
-                        : "Login / Sign Up"}
+                        ? " تسجيل الدخول / إنشاء حساب"
+                        : " Login / Sign Up"}
                     </button>
                   )}
                 </div>
@@ -400,7 +380,6 @@ export default function ChatApp() {
       <div
         ref={chatContainerRef}
         className="flex-1 overflow-y-auto relative z-10"
-        style={{ maxHeight: `calc(var(--vh, 1vh) * 100 - 64px - 80px)` }}
         onScroll={(e) => {
           const target = e.target;
           const isAtBottom =
@@ -419,7 +398,7 @@ export default function ChatApp() {
                 </span>
               </div>
 
-              <h2 className="text-3xl font-bold mb-3 bg-gradient-to-r from-blue-400 to-slate-600 bg-clip-text text-transparent">
+              <h2 className="  text-3xl font-bold mb-3 bg-gradient-to-r from-blue-400 to-slate-600 bg-clip-text text-transparent">
                 {language === "ar"
                   ? "هل ترغب أن أُطلعك على صورة شخصيته من تغريداته؟"
                   : "Want to see his personality through his tweets?"}
@@ -489,7 +468,7 @@ export default function ChatApp() {
         </div>
       )}
 
-      <div className="fix-ios-keyboard">
+      <div className="  sticky bottom-0 z-10">
         <div className="max-w-4xl mx-auto px-6 py-4">
           <div className="relative">
             <textarea
@@ -504,7 +483,6 @@ export default function ChatApp() {
               }}
               disabled={dailyCount >= 2 || loading}
               rows={1}
-              style={{ minHeight: "40px", maxHeight: "40px" }}
               className="w-full bg-gray-900 border border-gray-800 rounded-2xl px-4 py-2.5 pr-12 text-white placeholder-gray-500 focus:outline-none focus:border-gray-700 resize-none overflow-hidden transition-all"
             />
             <button
