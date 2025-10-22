@@ -22,6 +22,16 @@ export default function ChatApp() {
   const chatContainerRef = useRef(null);
   const messagesEndRef = useRef(null);
   const API_BASE = "https://tweetmind.duckdns.org";
+useEffect(() => {
+  const setVh = () => {
+    const vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty("--vh", `${vh}px`);
+  };
+
+  setVh();
+  window.addEventListener("resize", setVh);
+  return () => window.removeEventListener("resize", setVh);
+}, []);
 
   useEffect(() => {
     document.title =
@@ -468,7 +478,7 @@ export default function ChatApp() {
         </div>
       )}
 
-      <div className="  sticky bottom-0 z-10">
+      <div className="fix-ios-keyboard">
         <div className="max-w-4xl mx-auto px-6 py-4">
           <div className="relative">
             <textarea

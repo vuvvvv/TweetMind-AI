@@ -87,3 +87,29 @@ code {
 .animate-fade-in-out {
   animation: fadeInOut 3s ease-in-out forwards;
 }
+
+
+
+
+/* استخدم الارتفاع الديناميكي بدل 100vh */
+html, body {
+  height: calc(var(--vh, 1vh) * 100);
+  overflow: hidden;
+}
+
+#root, .chat-app {
+  height: calc(var(--vh, 1vh) * 100);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ثبت خانة الكتابة بأسفل الشاشة */
+.fix-ios-keyboard {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: transparent; /* ✅ شفافية كاملة */
+  z-index: 30;
+  padding-bottom: env(safe-area-inset-bottom);
+}
