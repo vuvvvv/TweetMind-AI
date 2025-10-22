@@ -23,6 +23,22 @@ export default function ChatApp() {
   const messagesEndRef = useRef(null);
   const API_BASE = "https://tweetmind.duckdns.org";
 
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.visualViewport) {
+        setKeyboardHeight(window.innerHeight - window.visualViewport.height);
+      }
+    };
+
+    window.visualViewport?.addEventListener("resize", handleResize);
+    return () => {
+      window.visualViewport?.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+
   useEffect(() => {
     document.title =
       language === "ar"
@@ -468,7 +484,10 @@ export default function ChatApp() {
         </div>
       )}
 
-      <div className="fixed bottom-0 left-0 w-full z-20  p-4">
+      <div
+        className="fixed bottom-0 left-0 w-full z-20  p-4"
+        style={{ bottom: `${keyboardHeight}px` }}
+      >
         <div className="max-w-4xl mx-auto relative">
           <textarea
             placeholder={
